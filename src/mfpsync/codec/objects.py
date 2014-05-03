@@ -118,9 +118,9 @@ class SyncRequest(BinaryPacket):
     packet_type = PACKET_TYPE_SYNC_REQUEST
 
     repr_names = (
-        'unknown1',
+        'api_version',
         'svn_revision',
-        'unknown2',
+        'unknown1',
         'username',
         'password',
         'flags',
@@ -129,9 +129,9 @@ class SyncRequest(BinaryPacket):
     )
 
     def set_default_values(self):
-        self.unknown1 = 6
+        self.api_version = 6
         self.svn_revision = 237
-        self.unknown2 = 2
+        self.unknown1 = 2
         self.username = ''
         self.password = ''
         self.flags = 0x5
@@ -139,9 +139,9 @@ class SyncRequest(BinaryPacket):
         self.last_sync_pointers = {}
 
     def read_body_from_codec(self, codec):
-        self.unknown1 = codec.read_2_byte_int()
+        self.api_version = codec.read_2_byte_int()
         self.svn_revision = codec.read_4_byte_int()
-        self.unknown2 = codec.read_2_byte_int()
+        self.unknown1 = codec.read_2_byte_int()
         self.username = codec.read_string()
         self.password = codec.read_string()
         self.flags = codec.read_2_byte_int()
@@ -152,9 +152,9 @@ class SyncRequest(BinaryPacket):
         )
 
     def write_body_to_codec(self, codec):
-        codec.write_2_byte_int(self.unknown1)
+        codec.write_2_byte_int(self.api_version)
         codec.write_4_byte_int(self.svn_revision)
-        codec.write_2_byte_int(self.unknown2)
+        codec.write_2_byte_int(self.unknown1)
         codec.write_string(self.username)
         codec.write_string(self.password)
         codec.write_2_byte_int(self.flags)
