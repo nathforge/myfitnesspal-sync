@@ -400,6 +400,18 @@ class FoodEntry(BinaryPacket):
         self.quantity = codec.read_float()
         self.weight_index = codec.read_4_byte_int()
 
+    @property
+    def portion(self):
+        return self.food.portions[self.weight_index]
+
+    @property
+    def nutrients(self):
+        multiplier = (self.quantity * self.portion.gram_weight) / self.food.grams
+        return {
+            key: value * multiplier if value is not None else None
+            for key, value in self.food.nutrients.iteritems()
+        }
+
 class ExerciseEntry(BinaryPacket):
     packet_type = PACKET_TYPE_EXERCISE_ENTRY
 
