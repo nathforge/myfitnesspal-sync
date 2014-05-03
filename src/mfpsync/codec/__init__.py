@@ -55,6 +55,9 @@ class Codec(object):
             )
         }
 
+    def __iter__(self):
+        return self.read_packets()
+
     @property
     def position(self):
         """
