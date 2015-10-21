@@ -89,7 +89,7 @@ class Sync(object):
         """
 
         request = urllib2.Request(url)
-        
+
         for key, value in headers.iteritems():
             request.add_header(key, value)
 
@@ -108,10 +108,10 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('username', nargs=1)
-    parser.add_argument('password', nargs=1)
+    parser.add_argument('username')
+    parser.add_argument('password')
 
     args = parser.parse_args()
-    
-    for packet in Sync(args.username[0], args.password[0]).get_packets():
+
+    for packet in Sync(args.username, args.password).get_packets():
         print packet
