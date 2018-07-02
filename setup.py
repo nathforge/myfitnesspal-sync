@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='mfpsync',
-    version='0.11',
+    version='0.12',
     package_dir={'': 'src'},
     packages=find_packages('src'),
     license='LICENSE.txt',
