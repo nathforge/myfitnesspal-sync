@@ -3,6 +3,7 @@ import argparse
 import datetime
 import json
 import os.path
+import sys
 
 from mfpsync import Sync
 from mfpsync.codec.objects import BinaryObject, SyncResult
@@ -26,11 +27,27 @@ def main():
 
     sync = Sync(args.username, args.password)
     packets = AllPackets(sync, last_sync_pointers)
-    print json.dumps(list(packets), cls=JSONEncoder, indent=4)
+    sys.stdout.write("[")
+    first_packet = True
+    for packet in packets:
+        sys.stdout.write(
+            ("\n" if first_packet else ",\n") + indent(
+                json.dumps(packet, cls=JSONEncoder, indent=4),
+                "    "
+            )
+        )
+        first_packet = False
+    sys.stdout.write("\n]")
 
     if args.pointers_filename:
         with open(args.pointers_filename, "w") as fp:
             json.dump(packets.last_sync_pointers, fp)
+
+def indent(string, prefix):
+    return "\n".join(
+        prefix + line
+        for line in string.split("\n")
+    )
 
 class AllPackets(object):
     def __init__(self, sync, last_sync_pointers={}):
