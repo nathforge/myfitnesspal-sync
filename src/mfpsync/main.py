@@ -56,16 +56,14 @@ class AllPackets(object):
 
     def __iter__(self):
         while True:
-            data_packet_count = 0
+            sync_result = None
             for packet in self.sync.get_packets(last_sync_pointers=self.last_sync_pointers):
                 if isinstance(packet, SyncResult):
-                    self.last_sync_pointers = packet.last_sync_pointers
-                else:
-                    data_packet_count += 1
-
+                    sync_result = packet
                 yield packet
 
-            if data_packet_count == 0:
+            self.last_sync_pointers = sync_result.last_sync_pointers
+            if not sync_result.more_data_to_sync:
                 break
 
 class JSONEncoder(json.JSONEncoder):
