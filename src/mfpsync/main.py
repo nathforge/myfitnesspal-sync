@@ -2,19 +2,54 @@ from collections import OrderedDict
 import argparse
 import datetime
 import json
+import os.path
 
 from mfpsync import Sync
-from mfpsync.codec.objects import BinaryObject
+from mfpsync.codec.objects import BinaryObject, SyncResult
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('username', nargs=1)
-    parser.add_argument('password', nargs=1)
+    parser.add_argument('username')
+    parser.add_argument('password')
+    parser.add_argument('-P', '--pointers-filename', required=False)
 
     args = parser.parse_args()
 
-    sync = Sync(args.username[0], args.password[0])
-    print json.dumps(list(sync.get_packets()), cls=JSONEncoder, indent=4)
+    last_sync_pointers = {}
+    if args.pointers_filename:
+        try:
+            with open(args.pointers_filename) as fp:
+                last_sync_pointers = json.load(fp)
+        except IOError:
+            if os.path.isfile(args.pointers_filename):
+                raise
+
+    sync = Sync(args.username, args.password)
+    packets = AllPackets(sync, last_sync_pointers)
+    print json.dumps(list(packets), cls=JSONEncoder, indent=4)
+
+    if args.pointers_filename:
+        with open(args.pointers_filename, "w") as fp:
+            json.dump(packets.last_sync_pointers, fp)
+
+class AllPackets(object):
+    def __init__(self, sync, last_sync_pointers={}):
+        self.sync = sync
+        self.last_sync_pointers = last_sync_pointers
+
+    def __iter__(self):
+        while True:
+            data_packet_count = 0
+            for packet in self.sync.get_packets(last_sync_pointers=self.last_sync_pointers):
+                if isinstance(packet, SyncResult):
+                    self.last_sync_pointers = packet.last_sync_pointers
+                else:
+                    data_packet_count += 1
+
+                yield packet
+
+            if data_packet_count == 0:
+                break
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, obj):
