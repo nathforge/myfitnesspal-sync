@@ -1,3 +1,12 @@
+DEPRECATED
+----------
+
+MyFitnessPal are moving to a new API protocol. This library implements the
+original V1 binary protocol - it's unknown how long that API will be supported.
+
+You may have better luck with this V2 library:
+https://github.com/coddingtonbear/python-myfitnesspal
+
 mfpsync
 =======
 
